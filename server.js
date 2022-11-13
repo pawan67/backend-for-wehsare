@@ -13,6 +13,10 @@ const postRoutes = require("./routes/postRoutes");
 const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
 
 app.use(cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 connectDB();
 app.use(express.json());
 
