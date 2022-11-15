@@ -17,10 +17,7 @@ const postSchema = mongoose.Schema(
     },
     likes: [
       {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
+        type: mongoose.Schema.Types.ObjectId,
       },
     ],
     comments: [
@@ -51,6 +48,10 @@ const postSchema = mongoose.Schema(
       required: true,
     },
     userName: {
+      type: String,
+      required: true,
+    },
+    name: {
       type: String,
       required: true,
     },

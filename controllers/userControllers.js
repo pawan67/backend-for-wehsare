@@ -106,8 +106,72 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
+const getRandomUsers = asyncHandler(async (req, res) => {
+  console.log("hitting");
+  const users = await User.find({}).sort({ createdAt: -1 });
+  if (users) {
+    res.json(users);
+  } else {
+    res.status(404);
+    throw new Error("Users not found");
+  }
+});
+
+const followUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const userToFollow = await User.findById(req.params.id);
+  if (user && userToFollow) {
+    if (user.following.includes(req.params.id)) {
+      res.status(400);
+      throw new Error("Already following");
+    } else {
+      user.following.push(req.params.id);
+      userToFollow.followers.push(req.user._id);
+      await user.save();
+      await userToFollow.save();
+      res.json(user);
+    }
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+const unfollowUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const userToUnfollow = await User.findById(req.params.id);
+  if (user && userToUnfollow) {
+    if (user.following.includes(req.params.id)) {
+      user.following = user.following.filter((item) => item != req.params.id);
+      userToUnfollow.followers = userToUnfollow.followers.filter(
+        (item) => item != req.user._id
+      );
+      await user.save();
+      await userToUnfollow.save();
+      res.json(user);
+    } else {
+      res.status(400);
+      throw new Error("Not following");
+    }
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+const searchUsers = asyncHandler(async (req, res) => {
+  let userPattern = new RegExp("^" + req.body.query);
+
+  const users = await User.find({ userName: { $regex: userPattern } });
+  res.json({ users });
+});
+
 module.exports = {
   registerUser,
   getUserProfile,
   authUser,
+  getRandomUsers,
+  followUser,
+  unfollowUser,
+  searchUsers,
 };

@@ -1,6 +1,6 @@
 const Post = require("../models/postModal");
 const asyncHandler = require("express-async-handler");
-
+const User = require("../models/userModel");
 const getAllPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find({ user: req.user._id }).sort({ createdAt: -1 });
   res.json(posts);
@@ -14,7 +14,8 @@ const createPost = asyncHandler(async (req, res) => {
     caption,
     image,
     userAvatar: req.user.pic,
-    userName: req.user.name,
+    name: req.user.name,
+    userName: req.user.userName,
   });
   res.json(post);
 });
@@ -70,6 +71,22 @@ const getRelatedPosts = asyncHandler(async (req, res) => {
   }
 });
 
+const getFollowingPosts = asyncHandler(async (req, res) => {
+  // const currentUser = await User.findById(req.user._id);
+
+  const posts = await Post.find({
+    user: { $in: req.user.following },
+  }).sort({ createdAt: -1 });
+  res.json(posts);
+});
+
+const getRandomPosts = asyncHandler(async (req, res) => {
+  const posts = await Post.find({ user: { $ne: req.user._id } }).sort({
+    createdAt: -1,
+  });
+  res.json(posts);
+});
+
 module.exports = {
   getAllPosts,
   createPost,
@@ -77,4 +94,6 @@ module.exports = {
   likePost,
   getPostData,
   getRelatedPosts,
+  getFollowingPosts,
+  getRandomPosts,
 };
