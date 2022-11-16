@@ -53,7 +53,7 @@ const authUser = asyncHandler(async (req, res) => {
         isAdmin: user.isAdmin,
         pic: user.pic,
         token: generateToken(user._id),
-        username: user.userName,
+        userName: user.userName,
         followers: user.followers,
         following: user.following,
       });
@@ -72,7 +72,7 @@ const authUser = asyncHandler(async (req, res) => {
         isAdmin: user.isAdmin,
         pic: user.pic,
         token: generateToken(user._id),
-        username: user.userName,
+        userName: user.userName,
         followers: user.followers,
         following: user.following,
       });
@@ -97,7 +97,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       pic: user.pic,
       followers: user.followers,
       following: user.following,
-      username: user.userName,
+      userName: user.userName,
       posts: posts,
     });
   } else {
@@ -166,6 +166,38 @@ const searchUsers = asyncHandler(async (req, res) => {
   res.json({ users });
 });
 
+const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (user) {
+    await user.remove();
+    res.json({ message: "User removed[...]" });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+const makeUserAdmin = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (user) {
+    user.isAdmin = true;
+    await user.save();
+    res.json({ message: "User is now admin" });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+const getInfoOfUserArrays = asyncHandler(async (req, res) => {
+  // get details of ['id1', 'id2', 'id3']
+
+  const arrayOfusers = req.body.users;
+  console.log(arrayOfusers);
+  const users = await User.find({ _id: { $in: arrayOfusers } });
+
+  res.json(users);
+});
 module.exports = {
   registerUser,
   getUserProfile,
@@ -174,4 +206,7 @@ module.exports = {
   followUser,
   unfollowUser,
   searchUsers,
+  deleteUser,
+  makeUserAdmin,
+  getInfoOfUserArrays,
 };
