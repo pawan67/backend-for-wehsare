@@ -54,6 +54,7 @@ const postSchema = mongoose.Schema(
     name: {
       type: String,
     },
+    
   },
   {
     timestamps: true,

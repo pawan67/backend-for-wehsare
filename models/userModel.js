@@ -43,6 +43,9 @@ const userSchema = mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
       },
     ],
+    bio: {
+      type: String,
+    },
   },
   {
     timestamps: true,

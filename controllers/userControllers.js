@@ -29,9 +29,10 @@ const registerUser = asyncHandler(async (req, res) => {
       isAdmin: user.isAdmin,
       pic: user.pic,
       token: generateToken(user._id),
-      username: user.userName,
+      userName: user.userName,
       followers: user.followers,
       following: user.following,
+      bio: user.bio,
     });
   } else {
     res.status(400);
@@ -56,6 +57,7 @@ const authUser = asyncHandler(async (req, res) => {
         userName: user.userName,
         followers: user.followers,
         following: user.following,
+        bio: user.bio,
       });
     } else {
       // send error with message "Invalid email or password"
@@ -75,6 +77,7 @@ const authUser = asyncHandler(async (req, res) => {
         userName: user.userName,
         followers: user.followers,
         following: user.following,
+        bio: user.bio,
       });
     } else {
       res.status(401);
@@ -99,6 +102,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
       following: user.following,
       userName: user.userName,
       posts: posts,
+      bio: user.bio,
     });
   } else {
     res.status(404);
@@ -121,7 +125,14 @@ const followUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   const userToFollow = await User.findById(req.params.id);
   if (user && userToFollow) {
-    if (user.following.includes(req.params.id)) {
+    if (userToFollow._id == user._id) {
+      res.status(400);
+      throw new Error("You cannot follow yourself");
+    }
+    if (
+      user.following.includes(req.params.id) ||
+      userToFollow.followers.includes(req.user._id)
+    ) {
       res.status(400);
       throw new Error("Already following");
     } else {
@@ -143,6 +154,7 @@ const unfollowUser = asyncHandler(async (req, res) => {
   if (user && userToUnfollow) {
     if (user.following.includes(req.params.id)) {
       user.following = user.following.filter((item) => item != req.params.id);
+
       userToUnfollow.followers = userToUnfollow.followers.filter(
         (item) => item != req.user._id
       );
@@ -198,6 +210,29 @@ const getInfoOfUserArrays = asyncHandler(async (req, res) => {
 
   res.json(users);
 });
+
+const updateUserDetails = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.pic = req.body.pic || user.pic;
+    user.userName = req.body.userName || user.userName;
+    user.bio = req.body.bio || user.bio;
+    if (req.body.password) {
+      user.password = req.body.password;
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({ message: "User updated" });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
 module.exports = {
   registerUser,
   getUserProfile,
@@ -209,4 +244,5 @@ module.exports = {
   deleteUser,
   makeUserAdmin,
   getInfoOfUserArrays,
+  updateUserDetails,
 };

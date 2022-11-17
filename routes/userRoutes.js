@@ -11,6 +11,7 @@ const {
 
   deleteUser,
   getInfoOfUserArrays,
+  updateUserDetails,
 } = require("../controllers/userControllers");
 const { protect } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -25,6 +26,7 @@ router.route("/search").post(searchUsers);
 
 router.route("/delete/:id").delete(deleteUser);
 router.route("/admin/:id").put(makeUserAdmin);
+router.route("/edit").put(protect, updateUserDetails);
 
 router.route("/info").post(getInfoOfUserArrays);
 module.exports = router;
