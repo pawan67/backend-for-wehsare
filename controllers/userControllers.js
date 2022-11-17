@@ -130,7 +130,7 @@ const followUser = asyncHandler(async (req, res) => {
       throw new Error("You cannot follow yourself");
     }
     if (
-      user.following.includes(req.params.id) ||
+      user.following.includes(req.params.id) &&
       userToFollow.followers.includes(req.user._id)
     ) {
       res.status(400);
