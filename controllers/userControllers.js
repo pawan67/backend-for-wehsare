@@ -4,13 +4,18 @@ const Post = require("../models/postModal");
 const generateToken = require("../utils/generateToken");
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, username, password, pic } = req.body;
+  const { name, email, userName, password, pic } = req.body;
 
   const userExists = await User.findOne({ email });
+  const usernameExists = await User.findOne({ userName });
 
   if (userExists) {
     res.status(400);
     throw new Error("User already exists");
+  }
+  if (usernameExists) {
+    res.status(400);
+    throw new Error("Username already exists");
   }
 
   const user = await User.create({
@@ -18,7 +23,7 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     pic,
-    userName: username,
+    userName: userName,
   });
 
   if (user) {
@@ -174,7 +179,9 @@ const unfollowUser = asyncHandler(async (req, res) => {
 const searchUsers = asyncHandler(async (req, res) => {
   let userPattern = new RegExp("^" + req.body.query);
 
-  const users = await User.find({ userName: { $regex: userPattern } });
+  const users = await User.find({
+    userName: { $regex: userPattern },
+  });
   res.json({ users });
 });
 
