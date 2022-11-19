@@ -116,8 +116,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 });
 
 const getRandomUsers = asyncHandler(async (req, res) => {
-  console.log("hitting");
-  const users = await User.find({}).sort({ createdAt: -1 });
+  const users = await User.find({}).sort({ followers: -1 });
   if (users) {
     res.json(users);
   } else {

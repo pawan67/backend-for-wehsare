@@ -26,14 +26,17 @@ const postSchema = mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
         },
-        text: {
+        comment: {
           type: String,
           required: true,
         },
         name: {
           type: String,
         },
-        avatar: {
+        userName: {
+          type: String,
+        },
+        pic: {
           type: String,
         },
         date: {
@@ -54,7 +57,6 @@ const postSchema = mongoose.Schema(
     name: {
       type: String,
     },
-    
   },
   {
     timestamps: true,

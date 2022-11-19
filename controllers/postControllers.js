@@ -87,6 +87,58 @@ const getRandomPosts = asyncHandler(async (req, res) => {
   res.json(posts);
 });
 
+const addComment = asyncHandler(async (req, res) => {
+  const { comment } = req.body;
+  const post = await Post.findById(req.params.id);
+  if (post) {
+    const newComment = {
+      comment,
+      user: req.user._id,
+      name: req.user.name,
+      userName: req.user.userName,
+      pic: req.user.pic,
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+    res.json(post);
+  } else {
+    res.status(404);
+    throw new Error("Post not found");
+  }
+});
+
+const deleteComment = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (post) {
+    const comment = post.comments.find(
+      (comment) => comment._id.toString() === req.params.comment_id
+    );
+    if (comment) {
+      await comment.remove();
+      await post.save();
+      res.json(post);
+    } else {
+      res.status(404);
+
+      throw new Error("Comment not found");
+    }
+  } else {
+    res.status(404);
+    throw new Error("Post not found");
+  }
+});
+
+const getComments = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (post) {
+    res.json(post.comments);
+  } else {
+    res.status(404);
+    throw new Error("Post not found");
+  }
+});
+
 module.exports = {
   getAllPosts,
   createPost,
@@ -96,4 +148,7 @@ module.exports = {
   getRelatedPosts,
   getFollowingPosts,
   getRandomPosts,
+  addComment,
+  deleteComment,
+  getComments,
 };
