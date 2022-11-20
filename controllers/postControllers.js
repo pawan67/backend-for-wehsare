@@ -72,11 +72,13 @@ const getRelatedPosts = asyncHandler(async (req, res) => {
 });
 
 const getFollowingPosts = asyncHandler(async (req, res) => {
-  // const currentUser = await User.findById(req.user._id);
-
-  const posts = await Post.find({
+  let posts = await Post.find({
     user: { $in: req.user.following },
   }).sort({ createdAt: -1 });
+
+  // randomize posts
+  posts = posts.sort(() => Math.random() - 0.5);
+
   res.json(posts);
 });
 
