@@ -1,6 +1,16 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
+const randomAvatar = () => {
+  const avatars = [
+    "https://i.imgur.com/uxUi2LO.png",
+    "https://i.imgur.com/jMApfhV.png",
+    "https://i.imgur.com/PMSPQIJ.png",
+    "https://i.imgur.com/qANz2br.png",
+  ];
+  return avatars[Math.floor(Math.random() * avatars.length)];
+};
+
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -11,7 +21,6 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      
     },
     email: {
       type: String,
@@ -30,8 +39,7 @@ const userSchema = mongoose.Schema(
     pic: {
       type: String,
       required: true,
-      default:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+      default: randomAvatar(),
     },
 
     followers: [
