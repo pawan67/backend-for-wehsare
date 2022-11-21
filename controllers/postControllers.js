@@ -92,9 +92,13 @@ const getFollowingPosts = asyncHandler(async (req, res) => {
 });
 
 const getRandomPosts = asyncHandler(async (req, res) => {
-  const posts = await Post.find({ user: { $ne: req.user._id } }).sort({
+  let posts = await Post.find({ user: { $ne: req.user._id } }).sort({
     createdAt: -1,
   });
+
+  // randomize posts
+  posts = posts.sort(() => Math.random() - 0.5);
+
   res.json(posts);
 });
 
