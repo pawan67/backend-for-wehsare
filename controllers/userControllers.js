@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const Post = require("../models/postModal");
 const generateToken = require("../utils/generateToken");
-
+const Notification = require("../models/notificationModal");
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, userName, password, pic } = req.body;
 
@@ -27,6 +27,16 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
+    // create notification for new user
+    const notification = await Notification.create({
+      user: user._id,
+      message: `Welcome to Weshare, ${user.name}!`,
+      type: "welcome",
+      sender: "6375a74570756a4b0cb98a97",
+      url: "/profile/pawan67",
+      senderImage: "https://i.imgur.com/TEMNv8X.png",
+    });
+
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -127,6 +137,7 @@ const getRandomUsers = asyncHandler(async (req, res) => {
 
 const followUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
+
   const userToFollow = await User.findById(req.params.id);
   if (user && userToFollow) {
     if (userToFollow._id == user._id) {
@@ -140,6 +151,16 @@ const followUser = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error("Already following");
     } else {
+      // create notification
+      const notification = await Notification.create({
+        user: userToFollow._id,
+        message: `${user.name} started following you`,
+        type: "follow",
+        sender: user._id,
+        url: `/profile/${user.userName}`,
+        senderImage: user.pic,
+      });
+
       user.following.push(req.params.id);
       userToFollow.followers.push(req.user._id);
       await user.save();
@@ -156,15 +177,23 @@ const unfollowUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   const userToUnfollow = await User.findById(req.params.id);
   if (user && userToUnfollow) {
-    if (user.following.includes(req.params.id)) {
+    if (
+      user.following.includes(req.params.id) ||
+      userToUnfollow.followers.includes(req.user._id)
+    ) {
+      const id = req.user._id.toString();
+      userToUnfollow.followers = userToUnfollow.followers.filter(
+        (item) => item != id
+      );
       user.following = user.following.filter((item) => item != req.params.id);
 
-      userToUnfollow.followers = userToUnfollow.followers.filter(
-        (item) => item != req.user._id
-      );
+      console.log(req.params.id);
+      // convert to string
+
+      console.log(id);
       await user.save();
       await userToUnfollow.save();
-      res.json(user);
+      res.json(userToUnfollow);
     } else {
       res.status(400);
       throw new Error("Not following");

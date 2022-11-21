@@ -10,6 +10,7 @@ const port = process.env.PORT || 5050;
 
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
+const notificationRoutes = require("./routes/notificationRoutes,js");
 const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
 
 app.use(cors());
@@ -22,6 +23,7 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running");

@@ -1,6 +1,7 @@
 const Post = require("../models/postModal");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
+const Notification = require("../models/notificationModal");
 const getAllPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find({ user: req.user._id }).sort({ createdAt: -1 });
   res.json(posts);
@@ -37,6 +38,14 @@ const likePost = asyncHandler(async (req, res) => {
     if (post.likes.includes(req.user._id)) {
       await post.likes.pull(req.user._id);
     } else {
+      const notification = await Notification.create({
+        user: post.user,
+        message: `${req.user.name} liked your post`,
+        type: "like",
+        sender: req.user._id,
+        url: `/p/${post._id}`,
+        senderImage: req.user.pic,
+      });
       await post.likes.push(req.user._id);
     }
     await post.save();
@@ -100,6 +109,15 @@ const addComment = asyncHandler(async (req, res) => {
       userName: req.user.userName,
       pic: req.user.pic,
     };
+
+    const notification = await Notification.create({
+      user: post.user,
+      message: `${req.user.name} commented on your post`,
+      type: "comment",
+      sender: req.user._id,
+      url: `/p/${post._id}?commentTrigger=true`,
+      senderImage: req.user.pic,
+    });
 
     post.comments.push(newComment);
     await post.save();
