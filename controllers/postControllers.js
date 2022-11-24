@@ -17,7 +17,7 @@ const createPost = asyncHandler(async (req, res) => {
     userAvatar: req.user.pic,
     name: req.user.name,
     userName: req.user.userName,
-    type
+    type,
   });
   res.json(post);
 });
@@ -79,6 +79,11 @@ const getRelatedPosts = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Post not found");
   }
+});
+
+const getVideoPosts = asyncHandler(async (req, res) => {
+  const posts = await Post.find({ type: "video" }).sort({ createdAt: -1 });
+  res.json(posts);
 });
 
 const getFollowingPosts = asyncHandler(async (req, res) => {
@@ -175,5 +180,6 @@ module.exports = {
   getRandomPosts,
   addComment,
   deleteComment,
+  getVideoPosts,
   getComments,
 };

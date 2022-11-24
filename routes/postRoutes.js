@@ -11,11 +11,13 @@ const {
   addComment,
   deleteComment,
   getComments,
+  getVideoPosts,
 } = require("../controllers/postControllers");
 const { protect } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 router.route("/").get(protect, getAllPosts).post(protect, createPost);
+router.route("/reels").get(protect, getVideoPosts);
 router.route("/:id").delete(protect, deletePost);
 router.route("/like/:id").post(protect, likePost);
 router.route("/post/:id").get(getPostData);
