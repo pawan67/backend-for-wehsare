@@ -8,7 +8,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 });
 
 const createPost = asyncHandler(async (req, res) => {
-  const { caption, image } = req.body;
+  const { caption, image, type } = req.body;
 
   const post = await Post.create({
     user: req.user._id,
@@ -17,6 +17,7 @@ const createPost = asyncHandler(async (req, res) => {
     userAvatar: req.user.pic,
     name: req.user.name,
     userName: req.user.userName,
+    type
   });
   res.json(post);
 });

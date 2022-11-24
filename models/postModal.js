@@ -10,6 +10,10 @@ const postSchema = mongoose.Schema(
     caption: {
       type: String,
     },
+    type: {
+      type: String,
+      default: "image",
+    },
     image: {
       type: String,
       required: true,
